@@ -1,23 +1,26 @@
 package model;
 
 public class TaiKhoan {
-    private int id;
+    private int id_taikhoan;
     private String email;
     private String matKhau;
     private String vaiTro;
-    private boolean trangThai;
+    private String trangThai;
 
     public TaiKhoan() {}
 
-    public int getId() {
-        return id;
-    }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    public int getId_taikhoan() {
+		return id_taikhoan;
+	}
 
-    public String getEmail() {
+
+	public void setId_taikhoan(int id_taikhoan) {
+		this.id_taikhoan = id_taikhoan;
+	}
+
+
+	public String getEmail() {
         return email;
     }
 
@@ -41,21 +44,21 @@ public class TaiKhoan {
         this.vaiTro = vaiTro;
     }
 
-    public boolean isTrangThai() {
-        return trangThai;
-    }
-
-    public void setTrangThai(boolean trangThai) {
-        this.trangThai = trangThai;
-    }
-
-    public TaiKhoan(int id, String email, String matKhau, String vaiTro, boolean trangThai) {
-        this.id = id;
+    public TaiKhoan(int id_taikhoan, String email, String matKhau, String vaiTro, String trangThai) {
+        this.id_taikhoan = id_taikhoan;
         this.email = email;
         this.matKhau = matKhau;
         this.vaiTro = vaiTro;
         this.trangThai = trangThai;
     }
+
+	public String getTrangThai() {
+		return trangThai;
+	}
+
+	public void setTrangThai(String trangThai) {
+		this.trangThai = trangThai;
+	}
 
     // Getter, Setter
 }

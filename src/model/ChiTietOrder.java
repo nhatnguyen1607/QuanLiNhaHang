@@ -5,22 +5,30 @@ public class ChiTietOrder {
     private int orderId;
     private int monAnId;
     private int soLuong;
-    private String ghiChu;
+    private String trangThai;
 
     public ChiTietOrder() {}
 
-    public ChiTietOrder(int id, int orderId, int monAnId, int soLuong, String ghiChu) {
+    public ChiTietOrder(int id, int orderId, int monAnId, int soLuong, String trangThai) {
         this.id = id;
         this.orderId = orderId;
         this.monAnId = monAnId;
         this.soLuong = soLuong;
-        this.ghiChu = ghiChu;
+        this.trangThai = trangThai;
     }
 
     // Getter, Setter
 
 
-    public int getId() {
+    public String getTrangThai() {
+		return trangThai;
+	}
+
+	public void setTrangThai(String trangThai) {
+		this.trangThai = trangThai;
+	}
+
+	public int getId() {
         return id;
     }
 
@@ -52,11 +60,4 @@ public class ChiTietOrder {
         this.soLuong = soLuong;
     }
 
-    public String getGhiChu() {
-        return ghiChu;
-    }
-
-    public void setGhiChu(String ghiChu) {
-        this.ghiChu = ghiChu;
-    }
 }

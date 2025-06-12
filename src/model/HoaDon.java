@@ -5,19 +5,21 @@ import java.time.LocalDateTime;
 public class HoaDon {
     private int id;
     private int orderId;
-    private double tongTien;
+    private long tongTien;
     private LocalDateTime thoiGianThanhToan;
+    private int id_khachhang;
+    private String phuongThucThanhToan;
 
     public HoaDon() {}
 
-    public HoaDon(int id, int orderId, double tongTien, LocalDateTime thoiGianThanhToan) {
+    public HoaDon(int id, int orderId, long tongTien, LocalDateTime thoiGianThanhToan, int id_khachhang, String phuongThucThanhToan) {
         this.id = id;
         this.orderId = orderId;
         this.tongTien = tongTien;
         this.thoiGianThanhToan = thoiGianThanhToan;
+        this.id_khachhang = id_khachhang;
+        this.phuongThucThanhToan = phuongThucThanhToan;
     }
-
-    // Getter, Setter
 
     public int getId() {
         return id;
@@ -35,11 +37,11 @@ public class HoaDon {
         this.orderId = orderId;
     }
 
-    public double getTongTien() {
+    public long getTongTien() {
         return tongTien;
     }
 
-    public void setTongTien(double tongTien) {
+    public void setTongTien(long tongTien) {
         this.tongTien = tongTien;
     }
 
@@ -49,5 +51,21 @@ public class HoaDon {
 
     public void setThoiGianThanhToan(LocalDateTime thoiGianThanhToan) {
         this.thoiGianThanhToan = thoiGianThanhToan;
+    }
+
+    public int getId_khachhang() {
+        return id_khachhang;
+    }
+
+    public void setId_khachhang(int id_khachhang) {
+        this.id_khachhang = id_khachhang;
+    }
+
+    public String getPhuongThucThanhToan() {
+        return phuongThucThanhToan;
+    }
+
+    public void setPhuongThucThanhToan(String phuongThucThanhToan) {
+        this.phuongThucThanhToan = phuongThucThanhToan;
     }
 }

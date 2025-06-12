@@ -4,148 +4,141 @@ import dao.BanAnDAO;
 import model.BanAn;
 import javax.swing.*;
 import java.awt.*;
-import java.io.Serializable;
-import java.net.URL;
+import java.awt.event.*;
+import java.sql.SQLException;
+import java.util.List;
 
-public class ChaoMungUI extends JFrame implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private JList<BanAn> banAnList;
-    private DefaultListModel<BanAn> listModel;
-    private JButton batDauButton;
+public class ChaoMungUI extends JFrame {
+    private int idTaiKhoan;
+    private String tenNhanVien;
     private BanAnDAO banAnDAO;
 
-    public ChaoMungUI() {
-        banAnDAO = new BanAnDAO();
+    public ChaoMungUI(int idTaiKhoan, String tenNhanVien) {
+        this.idTaiKhoan = idTaiKhoan;
+        this.tenNhanVien = tenNhanVien;
+        this.banAnDAO = new BanAnDAO();
+
         setTitle("Chào Mừng - Quản Lý Nhà Hàng");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setMinimumSize(new Dimension(800, 600));
+        setLocationRelativeTo(null);
 
-        // Tạo panel với ảnh nền
-        BackgroundPanel backgroundPanel = new BackgroundPanel("/image/background.png");
-        backgroundPanel.setLayout(new BorderLayout());
+        // Panel chính với gradient nền
+        JPanel backgroundPanel = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                GradientPaint gradient = new GradientPaint(0, 0, new Color(240, 248, 255), 0, getHeight(), new Color(245, 245, 220));
+                g2d.setPaint(gradient);
+                g2d.fillRect(0, 0, getWidth(), getHeight());
+            }
+        };
+        backgroundPanel.setOpaque(false);
         setContentPane(backgroundPanel);
 
-        // Tiêu đề
-        JLabel titleLabel = new JLabel("Chào Mừng Đến Với Nhà Hàng", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 40));
-        titleLabel.setForeground(Color.WHITE);
-        titleLabel.setOpaque(true);
-        titleLabel.setBackground(new Color(0, 0, 0, 150)); // Nền mờ
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        backgroundPanel.add(titleLabel, BorderLayout.NORTH);
+        // Panel tiêu đề
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setOpaque(false);
+        topPanel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
+        JLabel titleLabel = new JLabel("Nhà Hàng 2MN", JLabel.CENTER);
+        titleLabel.setFont(new Font("Roboto", Font.BOLD, 36));
+        titleLabel.setForeground(new Color(0, 102, 204));
+        topPanel.add(titleLabel, BorderLayout.CENTER);
 
-        // Danh sách bàn với kích thước nhỏ hơn
-        listModel = new DefaultListModel<>();
-        banAnList = new JList<>(listModel);
-        banAnList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        banAnList.setCellRenderer(new BanAnRenderer());
-        loadBanAnData();
-        banAnList.setFont(new Font("Arial", Font.PLAIN, 18));
-        banAnList.setBackground(new Color(255, 255, 255, 200)); // Nền mờ
-        banAnList.setForeground(Color.BLACK);
-        JScrollPane scrollPane = new JScrollPane(banAnList);
-        scrollPane.setPreferredSize(new Dimension(300, 400)); // Kích thước nhỏ hơn: 300x400 pixel
-        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.WHITE), "Danh Sách Bàn", 0, 0, new Font("Arial", Font.BOLD, 20), Color.WHITE));
+        JLabel chaoLabel = new JLabel("Chào, " + tenNhanVien, JLabel.RIGHT);
+        chaoLabel.setFont(new Font("Roboto", Font.PLAIN, 18));
+        chaoLabel.setForeground(new Color(0, 102, 204));
+        topPanel.add(chaoLabel, BorderLayout.EAST);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        backgroundPanel.add(topPanel, gbc);
+
+        // Panel danh sách bàn
+        JPanel banAnPanel = new JPanel(new GridLayout(0, 4, 20, 20));
+        banAnPanel.setOpaque(false);
+        JScrollPane scrollPane = new JScrollPane(banAnPanel);
+        scrollPane.setBorder(BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(new Color(0, 102, 204), 2),
+            "Danh Sách Bàn", 0, 0, new Font("Roboto", Font.BOLD, 22), new Color(0, 102, 204)
+        ));
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
 
-        // Đặt danh sách vào panel trung tâm để căn giữa
-        JPanel centerPanel = new JPanel(new GridBagLayout());
-        centerPanel.setOpaque(false);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(20, 0, 20, 0); // Khoảng cách
-        centerPanel.add(scrollPane, gbc);
-        backgroundPanel.add(centerPanel, BorderLayout.CENTER);
+        gbc.weighty = 1.0;
+        gbc.gridy = 1;
+        backgroundPanel.add(scrollPane, gbc);
 
-        // Nút "Bắt đầu sử dụng"
-        batDauButton = new JButton("Bắt Đầu Sử Dụng");
-        batDauButton.setFont(new Font("Arial", Font.BOLD, 20));
-        batDauButton.setBackground(new Color(50, 168, 82)); // Màu xanh lá
-        batDauButton.setForeground(Color.WHITE);
-        batDauButton.setFocusPainted(false);
-        batDauButton.addActionListener(e -> batDauSuDung());
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setOpaque(false);
-        buttonPanel.add(batDauButton);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        backgroundPanel.add(buttonPanel, BorderLayout.SOUTH);
+        // Load danh sách bàn
+        loadBanAn(banAnPanel);
 
         setVisible(true);
     }
 
-    private void loadBanAnData() {
-        listModel.clear();
-        java.util.List<BanAn> banAnListData = banAnDAO.getAllBanAn();
-        for (BanAn banAn : banAnListData) {
-            listModel.addElement(banAn);
-        }
-    }
-
-    private void batDauSuDung() {
-        BanAn selectedBan = banAnList.getSelectedValue();
-        if (selectedBan == null) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một bàn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        selectedBan.setTrangThai("DangPhucVu");
-        banAnDAO.updateBanAn(selectedBan);
-        new GiaoDienChinhUI(selectedBan.getId()); // Truyền id_ban sang giao diện chính
-        dispose();
-    }
-
-    private class BanAnRenderer extends DefaultListCellRenderer implements Serializable {
-        private static final long serialVersionUID = 1L;
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            BanAn banAn = (BanAn) value;
-            label.setText("Bàn " + banAn.getId() + " - Trạng thái: " + banAn.getTrangThai());
-            label.setFont(new Font("Arial", Font.PLAIN, 18));
-            if (isSelected) {
-                label.setBackground(new Color(50, 168, 82)); // Màu xanh lá khi chọn
-                label.setForeground(Color.WHITE);
-            } else {
-                label.setBackground(new Color(255, 255, 255, 200));
-                label.setForeground(Color.BLACK);
+    private void loadBanAn(JPanel banAnPanel) {
+        try {
+            List<BanAn> banAnList = banAnDAO.getAllBanAn();
+            banAnPanel.removeAll();
+            for (BanAn banAn : banAnList) {
+                JPanel banBox = createBanBox(banAn);
+                banAnPanel.add(banBox);
             }
-            return label;
+            banAnPanel.revalidate();
+            banAnPanel.repaint();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    // Class để hiển thị ảnh nền
-    private class BackgroundPanel extends JPanel {
-        private Image backgroundImage;
+    private JPanel createBanBox(BanAn banAn) {
+        JPanel box = new JPanel(new BorderLayout());
+        box.setPreferredSize(new Dimension(150, 100));
+        box.setBackground(banAn.getTrangThai().equals("DangPhucVu") ? new Color(255, 204, 204) : new Color(204, 255, 204));
+        box.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        ));
 
-        public BackgroundPanel(String imagePath) {
-            try {
-                URL url = getClass().getResource(imagePath);
-                if (url == null) {
-                    throw new IllegalArgumentException("Không tìm thấy tài nguyên: " + imagePath);
+        JLabel label = new JLabel("Bàn " + banAn.getId() + " (" + banAn.getTrangThai() + ")", JLabel.CENTER);
+        label.setFont(new Font("Roboto", Font.BOLD, 16));
+        label.setForeground(new Color(51, 51, 51));
+        box.add(label, BorderLayout.CENTER);
+
+        box.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (banAn.getTrangThai().equals("DangPhucVu")) {
+                    new GiaoDienChinhUI(idTaiKhoan, tenNhanVien, banAn.getId()).setVisible(true);
+                } else {
+                    new GiaoDienChinhUI(idTaiKhoan, tenNhanVien, banAn.getId()).setVisible(true);
                 }
-                backgroundImage = new ImageIcon(url).getImage();
-            } catch (Exception e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "Lỗi tải ảnh nền: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
-                backgroundImage = null; // Đặt null để tránh crash
+                dispose();
             }
-        }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                box.setBackground(banAn.getTrangThai().equals("DangPhucVu") ? new Color(255, 153, 153) : new Color(153, 255, 153));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                box.setBackground(banAn.getTrangThai().equals("DangPhucVu") ? new Color(255, 204, 204) : new Color(204, 255, 204));
+            }
+        });
 
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (backgroundImage != null) {
-                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-            } else {
-                g.setColor(Color.GRAY); // Màu nền mặc định nếu ảnh không tải được
-                g.fillRect(0, 0, getWidth(), getHeight());
-            }
-        }
+        return box;
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(ChaoMungUI::new);
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        SwingUtilities.invokeLater(() -> new ChaoMungUI(1, "Nhất Nguyễn"));
     }
 }

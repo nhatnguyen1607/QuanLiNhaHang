@@ -34,4 +34,28 @@ public class MonAnDAO {
         }
         return monAnList;
     }
+
+    public MonAn getMonAnById(int id) {
+        MonAn monAn = null;
+        String query = "SELECT * FROM MonAn WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    monAn = new MonAn();
+                    monAn.setId(rs.getInt("id"));
+                    monAn.setTenMon(rs.getString("tenMon"));
+                    monAn.setGia(rs.getInt("gia"));
+                    monAn.setTrangThai(rs.getString("trangThai"));
+                    monAn.setMoTa(rs.getString("moTa"));
+                    monAn.setHinhAnh(rs.getString("hinhAnh"));
+                    monAn.setId_thumuc(rs.getInt("id_thumuc"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return monAn;
+    }
 }
