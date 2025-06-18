@@ -3,6 +3,7 @@ package ui;
 import dao.TaiKhoanDAO;
 import dao.NhanVienDAO;
 import model.TaiKhoan;
+import utils.HashUtil;
 import model.NhanVien;
 import javax.swing.*;
 import java.awt.*;
@@ -101,15 +102,45 @@ public class DangNhapUI extends JFrame {
         setVisible(true);
     }
 
+//    private void dangNhap() {
+//        String email = emailField.getText();
+//        String matKhau = new String(matKhauField.getPassword());
+//
+//        try {
+//            TaiKhoan taiKhoan = taiKhoanDAO.getTaiKhoanByEmailAndMatKhau(email, matKhau);
+//            if (taiKhoan != null && "nhanvien".equals(taiKhoan.getVaiTro()) && "mo".equals(taiKhoan.getTrangThai())) {
+//                int idTaiKhoan = taiKhoan.getId_taikhoan();
+//                NhanVien nhanVien = nhanVienDAO.getNhanVienByIdTaiKhoan(idTaiKhoan);
+//                if (nhanVien != null) {
+//                    String tenNhanVien = nhanVien.getTen();
+//                    dispose();
+//                    new ChaoMungUI(idTaiKhoan, tenNhanVien); // Chuyển sang giao diện chọn bàn
+//                } else {
+//                    JOptionPane.showMessageDialog(this, "Không tìm thấy thông tin nhân viên!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+//                }
+//            } else {
+//                JOptionPane.showMessageDialog(this, "Email, mật khẩu, vai trò hoặc trạng thái không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+//            }
+//        } catch (SQLException e) {
+//            JOptionPane.showMessageDialog(this, "Lỗi kết nối cơ sở dữ liệu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+//            e.printStackTrace();
+//        }
+//    }
     private void dangNhap() {
-        String email = emailField.getText();
+        String email = emailField.getText().trim();
         String matKhau = new String(matKhauField.getPassword());
 
+        // Băm mật khẩu bằng SHA-256
+        String hashedMatKhau = HashUtil.sha256(matKhau);
+
         try {
-            TaiKhoan taiKhoan = taiKhoanDAO.getTaiKhoanByEmailAndMatKhau(email, matKhau);
+            // Tìm tài khoản bằng email và mật khẩu đã băm
+            TaiKhoan taiKhoan = taiKhoanDAO.getTaiKhoanByEmailAndMatKhau(email, hashedMatKhau);
+
             if (taiKhoan != null && "nhanvien".equals(taiKhoan.getVaiTro()) && "mo".equals(taiKhoan.getTrangThai())) {
                 int idTaiKhoan = taiKhoan.getId_taikhoan();
                 NhanVien nhanVien = nhanVienDAO.getNhanVienByIdTaiKhoan(idTaiKhoan);
+
                 if (nhanVien != null) {
                     String tenNhanVien = nhanVien.getTen();
                     dispose();

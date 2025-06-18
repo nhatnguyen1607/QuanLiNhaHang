@@ -42,12 +42,12 @@ public class KhachHangDAO {
         XepHangKhachHang newRank = xepHangDAO.getXepHangByDiem(khachHang.getDiemTichLuy());
         String newCapBac = (newRank != null) ? newRank.getCapBac() : "Thanh Vien";
 
-        String sql = "UPDATE khachhang SET hoTen = ?, soDienThoai = ?, diemTichLuy =  ?, capBac = ?, sinhNhat = ? WHERE id = ?";
+        String sql = "UPDATE khachhang SET hoTen = ?, soDienThoai = ?, diemTichLuy = ?, capBac = ?, sinhNhat = ? WHERE id = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, khachHang.getTen());
             pstmt.setString(2, khachHang.getSoDienThoai());
-            pstmt.setInt(3, khachHang.getDiemTichLuy()); // Phần tăng thêm
+            pstmt.setInt(3, khachHang.getDiemTichLuy());
             pstmt.setString(4, newCapBac);
             pstmt.setDate(5, khachHang.getSinhNhat() != null ? Date.valueOf(khachHang.getSinhNhat()) : null);
             pstmt.setInt(6, khachHang.getId());
@@ -77,9 +77,9 @@ public class KhachHangDAO {
     }
 
     public KhachHang getKhachHangBySoDienThoai(String soDienThoai) throws SQLException {
-//        if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
-//            throw new IllegalArgumentException("Số điện thoại không được để trống!");
-//        }
+        if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
+            throw new IllegalArgumentException("Số điện thoại không được để trống!");
+        }
 
         String sql = "SELECT * FROM khachhang WHERE soDienThoai = ?";
         try (Connection conn = getConnection();
@@ -116,6 +116,31 @@ public class KhachHangDAO {
                     rs.getString("capBac"),
                     rs.getDate("sinhNhat") != null ? rs.getDate("sinhNhat").toLocalDate() : null
                 ));
+            }
+        }
+        return list;
+    }
+
+    // Phương thức mới: Lấy danh sách khách hàng có sinh nhật hôm nay
+    public List<KhachHang> getKhachHangSinhNhatHomNay() throws SQLException {
+        LocalDate today = LocalDate.now(); // Ngày hiện tại: 18/06/2025
+        String sql = "SELECT * FROM khachhang WHERE MONTH(sinhNhat) = ? AND DAY(sinhNhat) = ?";
+        List<KhachHang> list = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, today.getMonthValue());
+            pstmt.setInt(2, today.getDayOfMonth());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new KhachHang(
+                        rs.getInt("id"),
+                        rs.getString("hoTen"),
+                        rs.getString("soDienThoai"),
+                        rs.getInt("diemTichLuy"),
+                        rs.getString("capBac"),
+                        rs.getDate("sinhNhat") != null ? rs.getDate("sinhNhat").toLocalDate() : null
+                    ));
+                }
             }
         }
         return list;

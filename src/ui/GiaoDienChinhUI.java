@@ -2,6 +2,8 @@ package ui;
 
 import dao.ThuMucMonAnDAO;
 import dao.MonAnDAO;
+import dao.MonAnNguyenLieuDAO;
+import dao.NguyenLieuDAO;
 import dao.OrderDAO;
 import dao.ChiTietOrderDAO;
 import dao.BanAnDAO;
@@ -9,8 +11,11 @@ import dao.KhachHangDAO;
 import dao.HoaDonDAO;
 import dao.LuongDAO;
 import dao.XepHangKhachHangDAO;
+import dao.ChiTietHoaDonDAO; // Thêm import mới
 import model.ThuMucMonAn;
 import model.MonAn;
+import model.MonAnNguyenLieu;
+import model.NguyenLieu;
 import model.GioHangItem;
 import model.Order;
 import model.BanAn;
@@ -19,6 +24,7 @@ import model.KhachHang;
 import model.Luong;
 import model.HoaDon;
 import model.XepHangKhachHang;
+import model.ChiTietHoaDon; // Thêm import mới
 import vnpay.Config;
 import vnpay.ajaxServlet;
 import vnpay.vnpayQuery;
@@ -79,6 +85,9 @@ public class GiaoDienChinhUI extends JFrame {
 	private HoaDonDAO hoaDonDAO;
 	private LuongDAO luongDAO;
 	private XepHangKhachHangDAO xepHangKhachHangDAO;
+	private ChiTietHoaDonDAO chiTietHoaDonDAO;
+	private MonAnNguyenLieuDAO monAnNguyenLieuDAO;
+	private NguyenLieuDAO nguyenLieuDAO;
 	private List<GioHangItem> gioHangList;
 	private JSplitPane splitPane;
 	private JLabel tongTienLabel;
@@ -98,6 +107,9 @@ public class GiaoDienChinhUI extends JFrame {
 		this.hoaDonDAO = new HoaDonDAO();
 		this.luongDAO = new LuongDAO();
 		this.xepHangKhachHangDAO = new XepHangKhachHangDAO();
+		this.chiTietHoaDonDAO = new ChiTietHoaDonDAO();
+		this.monAnNguyenLieuDAO = new MonAnNguyenLieuDAO();
+		this.nguyenLieuDAO = new NguyenLieuDAO();
 		this.gioHangList = new ArrayList<>();
 		this.gioHangModel = new DefaultTableModel(
 				new Object[] { "Hình ảnh", "Tên món", "Giá", "Số lượng", "Điều chỉnh" }, 0) {
@@ -288,16 +300,6 @@ public class GiaoDienChinhUI extends JFrame {
 
 		JPanel rightButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
 		rightButtonPanel.setOpaque(false);
-//		JButton clearCartButton = new JButton("Làm mới");
-//		clearCartButton.setFont(new Font("Roboto", Font.BOLD, 14));
-//		clearCartButton.setBackground(new Color(220, 53, 69));
-//		clearCartButton.setForeground(Color.WHITE);
-//		clearCartButton.setFocusPainted(false);
-//		clearCartButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-//		clearCartButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-//		clearCartButton.addActionListener(e -> clearCart());
-//		rightButtonPanel.add(clearCartButton);
-
 		JButton datMonButton = new JButton("Đặt Món");
 		datMonButton.setFont(new Font("Roboto", Font.BOLD, 14));
 		datMonButton.setBackground(new Color(40, 167, 69));
@@ -470,22 +472,40 @@ public class GiaoDienChinhUI extends JFrame {
 		priceLabel.setForeground(new Color(0, 102, 204));
 		infoPanel.add(priceLabel, BorderLayout.SOUTH);
 
+		// Kiểm tra trạng thái
+		if ("Het".equals(monAn.getTrangThai())) {
+			JLabel hetMonLabel = new JLabel("Hết món", JLabel.CENTER);
+			hetMonLabel.setFont(new Font("Roboto", Font.BOLD, 12));
+			hetMonLabel.setForeground(new Color(220, 53, 69));
+			infoPanel.add(hetMonLabel, BorderLayout.CENTER);
+			box.setBackground(new Color(200, 200, 200, 100)); // Làm mờ nền
+		}
+
 		box.add(infoPanel, BorderLayout.SOUTH);
 
 		box.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent evt) {
-				addToGioHang(monAn);
+				if (!"Het".equals(monAn.getTrangThai())) {
+					addToGioHang(monAn);
+				} else {
+					JOptionPane.showMessageDialog(GiaoDienChinhUI.this, "Món " + monAn.getTenMon() + " đã hết!",
+							"Thông báo", JOptionPane.WARNING_MESSAGE);
+				}
 			}
 
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				box.setBackground(new Color(240, 248, 255));
+				if (!box.getBackground().equals(new Color(200, 200, 200, 100))) {
+					box.setBackground(new Color(240, 248, 255));
+				}
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				box.setBackground(new Color(255, 255, 255));
+				if (!box.getBackground().equals(new Color(200, 200, 200, 100))) {
+					box.setBackground(new Color(255, 255, 255));
+				}
 			}
 		});
 
@@ -566,6 +586,8 @@ public class GiaoDienChinhUI extends JFrame {
 
 	    String ghiChu = ghiChuField.getText().trim();
 	    try {
+	        // Loại bỏ kiểm tra số lượng tồn kho
+
 	        // Kiểm tra và tạo Order mới nếu chưa có
 	        if (currentOrderId == -1) {
 	            Order order = new Order(0, idBan, idTaiKhoan, LocalDateTime.now(), "DangDat",
@@ -617,50 +639,83 @@ public class GiaoDienChinhUI extends JFrame {
 	}
 
 	private void loadAllOrdersForBan() {
+		try {
+			List<Order> orders = orderDAO.getOrdersByBanAnId(idBan);
+			gioHangList.clear();
+			gioHangModel.setRowCount(0);
+			currentOrderId = -1; // Reset trước khi kiểm tra
+			for (Order order : orders) {
+				if ("DangDat".equals(order.getTrangThai()) || "DaXong".equals(order.getTrangThai())) {
+					currentOrderId = order.getId(); // Gán currentOrderId từ đơn hàng đầu tiên hợp lệ
+					List<ChiTietOrder> chiTietOrders = chiTietOrderDAO.getChiTietOrdersByOrderId(order.getId());
+					for (ChiTietOrder chiTiet : chiTietOrders) {
+						MonAn monAn = monAnDAO.getMonAnById(chiTiet.getMonAnId());
+						if (monAn != null) {
+							GioHangItem item = new GioHangItem(monAn, chiTiet.getSoLuong(), chiTiet.getTrangThai());
+							gioHangList.add(item);
+						}
+					}
+					break; // Chỉ lấy đơn hàng đầu tiên hợp lệ
+				}
+			}
+			updateGioHangDisplay();
+			System.out.println("CurrentOrderId after load: " + currentOrderId); // Debug
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void xacNhanLenMon() {
+	    if (currentOrderId == -1) {
+	        JOptionPane.showMessageDialog(this, "Không có đơn hàng để xác nhận!", "Thông báo",
+	                JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
+
 	    try {
-	        List<Order> orders = orderDAO.getOrdersByBanAnId(idBan);
-	        gioHangList.clear();
-	        gioHangModel.setRowCount(0);
-	        currentOrderId = -1; // Reset trước khi kiểm tra
-	        for (Order order : orders) {
-	            if ("DangDat".equals(order.getTrangThai()) || "DaXong".equals(order.getTrangThai())) {
-	                currentOrderId = order.getId(); // Gán currentOrderId từ đơn hàng đầu tiên hợp lệ
-	                List<ChiTietOrder> chiTietOrders = chiTietOrderDAO.getChiTietOrdersByOrderId(order.getId());
-	                for (ChiTietOrder chiTiet : chiTietOrders) {
-	                    MonAn monAn = monAnDAO.getMonAnById(chiTiet.getMonAnId());
-	                    if (monAn != null) {
-	                        GioHangItem item = new GioHangItem(monAn, chiTiet.getSoLuong(), chiTiet.getTrangThai());
-	                        gioHangList.add(item);
+	        orderDAO.updateOrderStatus(currentOrderId, "DaXong");
+	        List<ChiTietOrder> chiTietOrders = chiTietOrderDAO.getChiTietOrdersByOrderId(currentOrderId);
+	        for (ChiTietOrder chiTiet : chiTietOrders) {
+	            // Chỉ xử lý món có trạng thái "Moi"
+	            if ("Moi".equals(chiTiet.getTrangThai())) {
+	                List<MonAnNguyenLieu> monAnNguyenLieus = monAnNguyenLieuDAO.getMonAnNguyenLieuByMonAnId(chiTiet.getMonAnId());
+	                boolean hetMon = false;
+	                for (MonAnNguyenLieu item : monAnNguyenLieus) {
+	                    NguyenLieu nguyenLieu = nguyenLieuDAO.getNguyenLieuById(item.getNguyenLieuId());
+	                    if (nguyenLieu != null) {
+	                        double soLuongSuDung = item.getSoLuongCan() * chiTiet.getSoLuong();
+	                        double newSoLuongTon = nguyenLieu.getSoLuongTon() - soLuongSuDung;
+	                        if (newSoLuongTon < 0) {
+	                            JOptionPane.showMessageDialog(this, "Nguyên liệu " + nguyenLieu.getTenNguyenLieu() + " không đủ!", "Lỗi",
+	                                    JOptionPane.ERROR_MESSAGE);
+	                            return;
+	                        }
+	                        nguyenLieuDAO.updateSoLuongTon(item.getNguyenLieuId(), newSoLuongTon);
+	                        if (item.getSoLuongCan() > newSoLuongTon) {
+	                            hetMon = true;
+	                        }
 	                    }
 	                }
-	                break; // Chỉ lấy đơn hàng đầu tiên hợp lệ
+	                // Cập nhật trạng thái món nếu hết
+	                if (hetMon) {
+	                    monAnDAO.updateMonAnTrangThai(chiTiet.getMonAnId(), "Het");
+	                }
 	            }
 	        }
-	        updateGioHangDisplay();
-	        System.out.println("CurrentOrderId after load: " + currentOrderId); // Debug
+	        chiTietOrderDAO.updateChiTietOrderStatus(currentOrderId, "Cu"); // Chuyển tất cả sang "Cu" sau khi xác nhận
+	        JOptionPane.showMessageDialog(this, "Xác nhận đã lên món thành công cho Bàn " + idBan + "!", "Thông báo",
+	                JOptionPane.INFORMATION_MESSAGE);
+	        loadAllOrdersForBan(); // Cập nhật lại danh sách để phản ánh trạng thái mới
+	    } catch (SQLException e) {
+	        JOptionPane.showMessageDialog(this, "Lỗi khi xác nhận: " + e.getMessage(), "Lỗi",
+	                JOptionPane.ERROR_MESSAGE);
+	        e.printStackTrace();
+	    }
+	    try {
+	        loadMonAnData();
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-	}
-	
-	private void xacNhanLenMon() {
-		if (currentOrderId == -1) {
-			JOptionPane.showMessageDialog(this, "Không có đơn hàng để xác nhận!", "Thông báo",
-					JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-
-		try {
-			orderDAO.updateOrderStatus(currentOrderId, "DaXong");
-			chiTietOrderDAO.updateChiTietOrderStatus(currentOrderId, "Cu");
-			JOptionPane.showMessageDialog(this, "Xác nhận đã lên món thành công cho Bàn " + idBan + "!", "Thông báo",
-					JOptionPane.INFORMATION_MESSAGE);
-			loadAllOrdersForBan();
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(this, "Lỗi khi xác nhận: " + e.getMessage(), "Lỗi",
-					JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		}
 	}
 
 	private void showThanhToanDialog() {
@@ -890,12 +945,25 @@ public class GiaoDienChinhUI extends JFrame {
 			// Bước 3: Xử lý thanh toán
 			try {
 				if ("COD".equals(phuongThucThanhToan)) {
-					chiTietOrderDAO.deleteAllChiTietOrder(currentOrderId);
-
+					// Lấy ID hóa đơn vừa tạo
 					HoaDon hoaDon = new HoaDon(0, currentOrderId, tongTienSauDiscount, LocalDateTime.now(), idKhachHang,
 							phuongThucThanhToan);
-					hoaDonDAO.addHoaDon(hoaDon);
+					int idHoaDon = hoaDonDAO.addHoaDon(hoaDon);
 
+					// Thêm chi tiết hóa đơn
+					List<ChiTietOrder> chiTietOrders = chiTietOrderDAO.getChiTietOrdersByOrderId(currentOrderId);
+					System.out.println("Số lượng chi tiết đơn hàng: " + chiTietOrders.size());
+					for (ChiTietOrder chiTiet : chiTietOrders) {
+						MonAn monAn = monAnDAO.getMonAnById(chiTiet.getMonAnId());
+						if (monAn != null) {
+							ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon(0, // id sẽ tự tăng
+									idHoaDon, chiTiet.getMonAnId(), chiTiet.getSoLuong(),
+									monAn.getGia() * chiTiet.getSoLuong());
+							System.out.println("chi tiết hóa đơn: " + chiTietHoaDon);
+							chiTietHoaDonDAO.addChiTietHoaDon(chiTietHoaDon);
+						}
+					}
+					chiTietOrderDAO.deleteAllChiTietOrder(currentOrderId);
 					KhachHang khachHang = khachHangDAO.getKhachHangById(idKhachHang);
 					int diemTichLuyTang = (int) (tongTien / 100000);
 					System.out.println("Điểm cũ:" + khachHang.getDiemTichLuy());
@@ -914,7 +982,6 @@ public class GiaoDienChinhUI extends JFrame {
 					luongDAO.updateDiemThuong(idTaiKhoan, diemThuongMoi);
 
 					updateBanAnStatus("Trong");
-
 					orderDAO.updateOrderStatus(currentOrderId, "DaThanhToan");
 
 					JOptionPane.showMessageDialog(this, "Thanh toán thành công cho Bàn " + idBan + "!", "Thông báo",
@@ -989,10 +1056,24 @@ public class GiaoDienChinhUI extends JFrame {
 				if ("00".equals(transactionStatus)) {
 					SwingUtilities.invokeLater(() -> {
 						try {
-							chiTietOrderDAO.deleteAllChiTietOrder(currentOrderId);
+							// Lấy ID hóa đơn vừa tạo
 							HoaDon hoaDon = new HoaDon(0, currentOrderId, tongTienSauDiscount, LocalDateTime.now(),
 									idKhachHang, "VNPay");
-							hoaDonDAO.addHoaDon(hoaDon);
+							int idHoaDon = hoaDonDAO.addHoaDon(hoaDon);
+
+							// Thêm chi tiết hóa đơn
+							List<ChiTietOrder> chiTietOrders = chiTietOrderDAO
+									.getChiTietOrdersByOrderId(currentOrderId);
+							for (ChiTietOrder chiTiet : chiTietOrders) {
+								MonAn monAn = monAnDAO.getMonAnById(chiTiet.getMonAnId());
+								if (monAn != null) {
+									ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon(0, idHoaDon, chiTiet.getMonAnId(),
+											chiTiet.getSoLuong(), monAn.getGia() * chiTiet.getSoLuong());
+									System.out.println("chi tiết hóa đơn:" + chiTietHoaDon);
+									chiTietHoaDonDAO.addChiTietHoaDon(chiTietHoaDon);
+								}
+							}
+							chiTietOrderDAO.deleteAllChiTietOrder(currentOrderId);
 
 							KhachHang khachHang = khachHangDAO.getKhachHangById(idKhachHang);
 							int diemTichLuyTang = (int) (tongTien / 100000);
@@ -1238,6 +1319,6 @@ public class GiaoDienChinhUI extends JFrame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		SwingUtilities.invokeLater(() -> new GiaoDienChinhUI(1, "Nhất Nguyễn", 4));
+		SwingUtilities.invokeLater(() -> new GiaoDienChinhUI(1, "Nhật Nguyễn", 4));
 	}
 }

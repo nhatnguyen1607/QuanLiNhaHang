@@ -2,6 +2,7 @@ package dao;
 
 import model.MonAn;
 import utils.DatabaseConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -57,5 +58,15 @@ public class MonAnDAO {
             e.printStackTrace();
         }
         return monAn;
+    }
+
+    public void updateMonAnTrangThai(int monAnId, String trangThai) throws SQLException {
+        String sql = "UPDATE MonAn SET trangThai = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, trangThai);
+            stmt.setInt(2, monAnId);
+            stmt.executeUpdate();
+        }
     }
 }
