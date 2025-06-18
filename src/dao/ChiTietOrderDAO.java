@@ -23,7 +23,7 @@ public class ChiTietOrderDAO {
     }
 
     public void updateChiTietOrderStatus(int orderId, String newStatus) throws SQLException {
-        String query = "UPDATE ChiTietOrder SET trangThai = ? WHERE orderId= ?";
+        String query = "UPDATE ChiTietOrder SET trangThai = ? WHERE orderId = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, newStatus);
@@ -53,6 +53,28 @@ public class ChiTietOrderDAO {
         return chiTietList;
     }
 
+    public List<ChiTietOrder> getChiTietOrdersByOrderIdAndMonAnId(int orderId, int monAnId) throws SQLException {
+        List<ChiTietOrder> chiTietList = new ArrayList<>();
+        String query = "SELECT * FROM ChiTietOrder WHERE orderId = ? AND monAnId = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, orderId);
+            stmt.setInt(2, monAnId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    ChiTietOrder chiTiet = new ChiTietOrder();
+                    chiTiet.setId(rs.getInt("id"));
+                    chiTiet.setOrderId(rs.getInt("orderId"));
+                    chiTiet.setMonAnId(rs.getInt("monAnId"));
+                    chiTiet.setSoLuong(rs.getInt("soLuong"));
+                    chiTiet.setTrangThai(rs.getString("trangThai"));
+                    chiTietList.add(chiTiet);
+                }
+            }
+        }
+        return chiTietList;
+    }
+
     public String getChiTietOrderStatus(int orderId, int monAnId) throws SQLException {
         String query = "SELECT trangThai FROM ChiTietOrder WHERE orderId = ? AND monAnId = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -67,11 +89,12 @@ public class ChiTietOrderDAO {
         }
         return "Moi"; // Mặc định nếu không tìm thấy
     }
+
     public void deleteAllChiTietOrder(int orderId) throws SQLException {
         String query = "DELETE FROM ChiTietOrder WHERE orderId = ?";
         try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-        	stmt.setInt(1, orderId);
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, orderId);
             stmt.executeUpdate();
         }
     }

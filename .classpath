@@ -10,5 +10,9 @@
 	<classpathentry kind="lib" path="C:/Users/PC/Downloads/jar_files/mysql-connector-java-8.0.30.jar"/>
 	<classpathentry kind="lib" path="C:/Users/PC/Downloads/slf4j-api-2.0.7.jar"/>
 	<classpathentry kind="lib" path="C:/Users/PC/Downloads/log4j-slf4j2-impl-2.23.1.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/gson-2.10.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/javax.servlet-api-4.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
