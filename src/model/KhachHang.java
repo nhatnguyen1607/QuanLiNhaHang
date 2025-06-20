@@ -4,26 +4,35 @@ import java.time.LocalDate;
 
 public class KhachHang {
     private int id;
-    private String ten; // Thay hoTen bằng ten để nhất quán với yêu cầu trước
+    private String ten; 
     private String soDienThoai;
     private int diemTichLuy;
     private String capBac;
     private LocalDate sinhNhat;
+    private String email;
 
 
     public KhachHang() {}
 
-    public KhachHang(int id, String ten, String soDienThoai, int diemTichLuy, String capBac, LocalDate sinhNhat) {
+    public KhachHang(int id, String ten, String soDienThoai, int diemTichLuy, String capBac, LocalDate sinhNhat, String email) {
         this.id = id;
         this.ten = ten;
         this.soDienThoai = soDienThoai;
         this.diemTichLuy = diemTichLuy;
         this.capBac = capBac;
         this.sinhNhat = sinhNhat;
-
+        this.email = email;
     }
 
-    public int getId() {
+    public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public int getId() {
         return id;
     }
 

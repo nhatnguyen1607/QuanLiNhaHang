@@ -19,7 +19,7 @@ public class KhachHangDAO {
         XepHangKhachHang defaultRank = xepHangDAO.getXepHangByDiem(0);
         String defaultCapBac = (defaultRank != null) ? defaultRank.getCapBac() : "Thanh Vien";
 
-        String sql = "INSERT INTO khachhang (hoTen, soDienThoai, diemTichLuy, capBac, sinhNhat) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO khachhang (hoTen, soDienThoai, diemTichLuy, capBac, sinhNhat, email) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, khachHang.getTen());
@@ -27,6 +27,7 @@ public class KhachHangDAO {
             pstmt.setInt(3, khachHang.getDiemTichLuy());
             pstmt.setString(4, defaultCapBac);
             pstmt.setDate(5, khachHang.getSinhNhat() != null ? Date.valueOf(khachHang.getSinhNhat()) : Date.valueOf(LocalDate.now()));
+            pstmt.setString(6, khachHang.getEmail());
             pstmt.executeUpdate();
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -42,7 +43,7 @@ public class KhachHangDAO {
         XepHangKhachHang newRank = xepHangDAO.getXepHangByDiem(khachHang.getDiemTichLuy());
         String newCapBac = (newRank != null) ? newRank.getCapBac() : "Thanh Vien";
 
-        String sql = "UPDATE khachhang SET hoTen = ?, soDienThoai = ?, diemTichLuy = ?, capBac = ?, sinhNhat = ? WHERE id = ?";
+        String sql = "UPDATE khachhang SET hoTen = ?, soDienThoai = ?, diemTichLuy = ?, capBac = ?, sinhNhat = ? , email=? WHERE id = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, khachHang.getTen());
@@ -50,7 +51,8 @@ public class KhachHangDAO {
             pstmt.setInt(3, khachHang.getDiemTichLuy());
             pstmt.setString(4, newCapBac);
             pstmt.setDate(5, khachHang.getSinhNhat() != null ? Date.valueOf(khachHang.getSinhNhat()) : null);
-            pstmt.setInt(6, khachHang.getId());
+            pstmt.setString(6, khachHang.getEmail());
+            pstmt.setInt(7, khachHang.getId());
             pstmt.executeUpdate();
         }
     }
@@ -68,7 +70,8 @@ public class KhachHangDAO {
                         rs.getString("soDienThoai"),
                         rs.getInt("diemTichLuy"),
                         rs.getString("capBac"),
-                        rs.getDate("sinhNhat") != null ? rs.getDate("sinhNhat").toLocalDate() : null
+                        rs.getDate("sinhNhat") != null ? rs.getDate("sinhNhat").toLocalDate() : null,
+                        rs.getString("email")
                     );
                 }
             }
@@ -93,7 +96,8 @@ public class KhachHangDAO {
                         rs.getString("soDienThoai"),
                         rs.getInt("diemTichLuy"),
                         rs.getString("capBac"),
-                        rs.getDate("sinhNhat") != null ? rs.getDate("sinhNhat").toLocalDate() : null
+                        rs.getDate("sinhNhat") != null ? rs.getDate("sinhNhat").toLocalDate() : null,
+                        rs.getString("email")
                     );
                 }
             }
@@ -114,16 +118,16 @@ public class KhachHangDAO {
                     rs.getString("soDienThoai"),
                     rs.getInt("diemTichLuy"),
                     rs.getString("capBac"),
-                    rs.getDate("sinhNhat") != null ? rs.getDate("sinhNhat").toLocalDate() : null
+                    rs.getDate("sinhNhat") != null ? rs.getDate("sinhNhat").toLocalDate() : null,
+                    rs.getString("email")
                 ));
             }
         }
         return list;
     }
 
-    // Phương thức mới: Lấy danh sách khách hàng có sinh nhật hôm nay
     public List<KhachHang> getKhachHangSinhNhatHomNay() throws SQLException {
-        LocalDate today = LocalDate.now(); // Ngày hiện tại: 18/06/2025
+        LocalDate today = LocalDate.now(); 
         String sql = "SELECT * FROM khachhang WHERE MONTH(sinhNhat) = ? AND DAY(sinhNhat) = ?";
         List<KhachHang> list = new ArrayList<>();
         try (Connection conn = getConnection();
@@ -138,7 +142,8 @@ public class KhachHangDAO {
                         rs.getString("soDienThoai"),
                         rs.getInt("diemTichLuy"),
                         rs.getString("capBac"),
-                        rs.getDate("sinhNhat") != null ? rs.getDate("sinhNhat").toLocalDate() : null
+                        rs.getDate("sinhNhat") != null ? rs.getDate("sinhNhat").toLocalDate() : null,
+                        rs.getString("email")
                     ));
                 }
             }

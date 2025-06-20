@@ -719,323 +719,332 @@ public class GiaoDienChinhUI extends JFrame {
 	}
 
 	private void showThanhToanDialog() {
-		if (currentOrderId == -1) {
-			JOptionPane.showMessageDialog(this, "Không có đơn hàng để thanh toán!", "Thông báo",
-					JOptionPane.WARNING_MESSAGE);
-			return;
-		}
+	    if (currentOrderId == -1) {
+	        JOptionPane.showMessageDialog(this, "Không có đơn hàng để thanh toán!", "Thông báo",
+	                JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
 
-		// Bước 1: Nhập thông tin khách hàng
-		JTextField soDienThoaiField = new JTextField(15);
-		JTextField tenField = new JTextField(15);
-		JTextField sinhNhatField = new JTextField(15);
-		JButton searchButton = new JButton("Tìm kiếm");
+	    // Bước 1: Nhập thông tin khách hàng
+	    JTextField soDienThoaiField = new JTextField(15);
+	    JTextField tenField = new JTextField(15);
+	    JTextField sinhNhatField = new JTextField(15);
+	    JTextField emailField = new JTextField(15); // Thêm textfield cho email
+	    JButton searchButton = new JButton("Tìm kiếm");
 
-		JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
-		inputPanel.setBackground(new Color(245, 245, 245));
-		inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	    JPanel inputPanel = new JPanel(new GridLayout(5, 2, 10, 10)); // Tăng số hàng lên 5
+	    inputPanel.setBackground(new Color(245, 245, 245));
+	    inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-		JLabel soDienThoaiLabel = new JLabel("Số điện thoại:");
-		soDienThoaiLabel.setFont(new Font("Arial", Font.BOLD, 14));
-		soDienThoaiField.setBackground(new Color(230, 243, 250));
-		soDienThoaiField.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
-		JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-		phonePanel.setBackground(new Color(245, 245, 245));
-		phonePanel.add(soDienThoaiField);
-		searchButton.setBackground(new Color(74, 144, 226));
-		searchButton.setForeground(Color.WHITE);
-		searchButton.setFocusPainted(false);
-		searchButton.setFont(new Font("Arial", Font.BOLD, 12));
-		searchButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-		searchButton.addActionListener(e -> {
-			String soDienThoai = soDienThoaiField.getText().trim();
-			if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
-				JOptionPane.showMessageDialog(this, "Vui lòng nhập số điện thoại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-			} else {
-				try {
-					KhachHang khachHang = khachHangDAO.getKhachHangBySoDienThoai(soDienThoai);
-					if (khachHang != null) {
-						tenField.setText(khachHang.getTen());
-						sinhNhatField
-								.setText(khachHang.getSinhNhat() != null ? khachHang.getSinhNhat().toString() : "");
-					} else {
-						tenField.setText("");
-						sinhNhatField.setText("");
-					}
-				} catch (SQLException ex) {
-					ex.printStackTrace();
-					JOptionPane.showMessageDialog(this, "Lỗi khi tìm kiếm: " + ex.getMessage(), "Lỗi",
-							JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		});
-		phonePanel.add(searchButton);
+	    JLabel soDienThoaiLabel = new JLabel("Số điện thoại:");
+	    soDienThoaiLabel.setFont(new Font("Arial", Font.BOLD, 14));
+	    soDienThoaiField.setBackground(new Color(230, 243, 250));
+	    soDienThoaiField.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
+	    JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	    phonePanel.setBackground(new Color(245, 245, 245));
+	    phonePanel.add(soDienThoaiField);
+	    searchButton.setBackground(new Color(74, 144, 226));
+	    searchButton.setForeground(Color.WHITE);
+	    searchButton.setFocusPainted(false);
+	    searchButton.setFont(new Font("Arial", Font.BOLD, 12));
+	    searchButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+	    searchButton.addActionListener(e -> {
+	        String soDienThoai = soDienThoaiField.getText().trim();
+	        if (soDienThoai == null || soDienThoai.trim().isEmpty()) {
+	            JOptionPane.showMessageDialog(this, "Vui lòng nhập số điện thoại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+	        } else {
+	            try {
+	                KhachHang khachHang = khachHangDAO.getKhachHangBySoDienThoai(soDienThoai);
+	                if (khachHang != null) {
+	                    tenField.setText(khachHang.getTen());
+	                    sinhNhatField.setText(khachHang.getSinhNhat() != null ? khachHang.getSinhNhat().toString() : "");
+	                    emailField.setText(khachHang.getEmail() != null ? khachHang.getEmail() : ""); // Điền email
+	                } else {
+	                    tenField.setText("");
+	                    sinhNhatField.setText("");
+	                    emailField.setText(""); // Reset email khi không tìm thấy
+	                }
+	            } catch (SQLException ex) {
+	                ex.printStackTrace();
+	                JOptionPane.showMessageDialog(this, "Lỗi khi tìm kiếm: " + ex.getMessage(), "Lỗi",
+	                        JOptionPane.ERROR_MESSAGE);
+	            }
+	        }
+	    });
+	    phonePanel.add(searchButton);
 
-		JLabel tenLabel = new JLabel("Tên:");
-		tenLabel.setFont(new Font("Arial", Font.BOLD, 14));
-		tenField.setBackground(new Color(230, 243, 250));
-		tenField.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
+	    JLabel tenLabel = new JLabel("Tên:");
+	    tenLabel.setFont(new Font("Arial", Font.BOLD, 14));
+	    tenField.setBackground(new Color(230, 243, 250));
+	    tenField.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
 
-		JLabel sinhNhatLabel = new JLabel("Sinh nhật (YYYY-MM-DD):");
-		sinhNhatLabel.setFont(new Font("Arial", Font.BOLD, 14));
-		sinhNhatField.setBackground(new Color(230, 243, 250));
-		sinhNhatField.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
+	    JLabel sinhNhatLabel = new JLabel("Sinh nhật (YYYY-MM-DD):");
+	    sinhNhatLabel.setFont(new Font("Arial", Font.BOLD, 14));
+	    sinhNhatField.setBackground(new Color(230, 243, 250));
+	    sinhNhatField.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
 
-		inputPanel.add(soDienThoaiLabel);
-		inputPanel.add(phonePanel);
-		inputPanel.add(tenLabel);
-		inputPanel.add(tenField);
-		inputPanel.add(sinhNhatLabel);
-		inputPanel.add(sinhNhatField);
+	    JLabel emailLabel = new JLabel("Email:"); // Thêm label cho email
+	    emailLabel.setFont(new Font("Arial", Font.BOLD, 14));
+	    emailField.setBackground(new Color(230, 243, 250));
+	    emailField.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
 
-		JOptionPane pane = new JOptionPane(inputPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-		JDialog dialog = pane.createDialog(this, "Nhập thông tin khách hàng");
-		dialog.getContentPane().setBackground(new Color(245, 245, 245));
-		JRootPane rootPane = dialog.getRootPane();
-		JButton okButton = rootPane.getDefaultButton();
-		okButton.setBackground(new Color(74, 144, 226));
-		okButton.setForeground(Color.WHITE);
-		okButton.setFocusPainted(false);
-		okButton.setFont(new Font("Arial", Font.BOLD, 12));
-		okButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-		JButton cancelButton = (JButton) Arrays.stream(rootPane.getComponents())
-				.filter(c -> c instanceof JButton && ((JButton) c).getText().equals("Cancel")).findFirst().orElse(null);
-		if (cancelButton != null) {
-			cancelButton.setBackground(new Color(74, 144, 226));
-			cancelButton.setForeground(Color.WHITE);
-			cancelButton.setFocusPainted(false);
-			cancelButton.setFont(new Font("Arial", Font.BOLD, 12));
-			cancelButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-		}
-		dialog.setVisible(true);
+	    inputPanel.add(soDienThoaiLabel);
+	    inputPanel.add(phonePanel);
+	    inputPanel.add(tenLabel);
+	    inputPanel.add(tenField);
+	    inputPanel.add(sinhNhatLabel);
+	    inputPanel.add(sinhNhatField);
+	    inputPanel.add(emailLabel); // Thêm label email
+	    inputPanel.add(emailField); // Thêm textfield email
 
-		if (pane.getValue() != null && (int) pane.getValue() == JOptionPane.OK_OPTION) {
-			String soDienThoai = soDienThoaiField.getText().trim();
-			String ten = tenField.getText().trim();
-			String sinhNhatStr = sinhNhatField.getText().trim();
-			LocalDate sinhNhat = (sinhNhatStr.isEmpty()) ? LocalDate.of(2000, 1, 1) : LocalDate.parse(sinhNhatStr);
-			int idKhachHang = -1;
-			float uuDai = 0;
+	    JOptionPane pane = new JOptionPane(inputPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+	    JDialog dialog = pane.createDialog(this, "Nhập thông tin khách hàng");
+	    dialog.getContentPane().setBackground(new Color(245, 245, 245));
+	    JRootPane rootPane = dialog.getRootPane();
+	    JButton okButton = rootPane.getDefaultButton();
+	    okButton.setBackground(new Color(74, 144, 226));
+	    okButton.setForeground(Color.WHITE);
+	    okButton.setFocusPainted(false);
+	    okButton.setFont(new Font("Arial", Font.BOLD, 12));
+	    okButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+	    JButton cancelButton = (JButton) Arrays.stream(rootPane.getComponents())
+	            .filter(c -> c instanceof JButton && ((JButton) c).getText().equals("Cancel")).findFirst().orElse(null);
+	    if (cancelButton != null) {
+	        cancelButton.setBackground(new Color(74, 144, 226));
+	        cancelButton.setForeground(Color.WHITE);
+	        cancelButton.setFocusPainted(false);
+	        cancelButton.setFont(new Font("Arial", Font.BOLD, 12));
+	        cancelButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+	    }
+	    dialog.setVisible(true);
 
-			try {
-				KhachHang existingKhachHang = khachHangDAO.getKhachHangBySoDienThoai(soDienThoai);
-				if (existingKhachHang != null) {
-					idKhachHang = existingKhachHang.getId();
-				} else {
-					KhachHang newKhachHang = new KhachHang(0, ten, soDienThoai, 0, "Thanh Vien", sinhNhat);
-					idKhachHang = khachHangDAO.addKhachHang(newKhachHang);
-				}
+	    if (pane.getValue() != null && (int) pane.getValue() == JOptionPane.OK_OPTION) {
+	        String soDienThoai = soDienThoaiField.getText().trim();
+	        String ten = tenField.getText().trim();
+	        String sinhNhatStr = sinhNhatField.getText().trim();
+	        String email = emailField.getText().trim(); // Lấy giá trị email
+	        LocalDate sinhNhat = (sinhNhatStr.isEmpty()) ? LocalDate.of(2000, 1, 1) : LocalDate.parse(sinhNhatStr);
+	        int idKhachHang = -1;
+	        float uuDai = 0;
 
-				KhachHang khachHang = khachHangDAO.getKhachHangById(idKhachHang);
-				XepHangKhachHangDAO xepHangDAO = new XepHangKhachHangDAO();
-				XepHangKhachHang xepHang = xepHangDAO.getXepHangByDiem(khachHang.getDiemTichLuy());
-				if (xepHang != null) {
-					khachHang.setCapBac(xepHang.getCapBac());
-					uuDai = xepHang.getUuDai();
-					khachHangDAO.updateKhachHang(khachHang);
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(this, "Lỗi khi xử lý khách hàng: " + e.getMessage(), "Lỗi",
-						JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+	        try {
+	            KhachHang existingKhachHang = khachHangDAO.getKhachHangBySoDienThoai(soDienThoai);
+	            if (existingKhachHang != null) {
+	                idKhachHang = existingKhachHang.getId();
+	            } else {
+	                KhachHang newKhachHang = new KhachHang(0, ten, soDienThoai, 0, "Thanh Vien", sinhNhat, email); // Thêm email
+	                idKhachHang = khachHangDAO.addKhachHang(newKhachHang);
+	            }
 
-			// Bước 2: Tạo bill
-			Map<Integer, Integer> monAnMap = new HashMap<>();
-			long tongTien = 0;
-			try {
-				List<ChiTietOrder> chiTietOrders = chiTietOrderDAO.getChiTietOrdersByOrderId(currentOrderId);
-				for (ChiTietOrder chiTiet : chiTietOrders) {
-					monAnMap.merge(chiTiet.getMonAnId(), chiTiet.getSoLuong(), Integer::sum);
-					MonAn monAn = monAnDAO.getMonAnById(chiTiet.getMonAnId());
-					if (monAn != null) {
-						tongTien += monAn.getGia() * chiTiet.getSoLuong();
-					}
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(this, "Lỗi khi lấy chi tiết đơn hàng: " + e.getMessage(), "Lỗi",
-						JOptionPane.ERROR_MESSAGE);
-				return;
-			}
+	            KhachHang khachHang = khachHangDAO.getKhachHangById(idKhachHang);
+	            XepHangKhachHangDAO xepHangDAO = new XepHangKhachHangDAO();
+	            XepHangKhachHang xepHang = xepHangDAO.getXepHangByDiem(khachHang.getDiemTichLuy());
+	            if (xepHang != null) {
+	                khachHang.setCapBac(xepHang.getCapBac());
+	                uuDai = xepHang.getUuDai();
+	                khachHang.setEmail(email); // Cập nhật email
+	                khachHangDAO.updateKhachHang(khachHang);
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	            JOptionPane.showMessageDialog(this, "Lỗi khi xử lý khách hàng: " + e.getMessage(), "Lỗi",
+	                    JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
 
-			long tongTienSauDiscount = (long) (tongTien * (1 - uuDai));
-			System.out.println(
-					"tongTien: " + tongTien + ", uuDai: " + uuDai + ", tongTienSauDiscount: " + tongTienSauDiscount);
+	        // Bước 2: Tạo bill
+	        Map<Integer, Integer> monAnMap = new HashMap<>();
+	        long tongTien = 0;
+	        try {
+	            List<ChiTietOrder> chiTietOrders = chiTietOrderDAO.getChiTietOrdersByOrderId(currentOrderId);
+	            for (ChiTietOrder chiTiet : chiTietOrders) {
+	                monAnMap.merge(chiTiet.getMonAnId(), chiTiet.getSoLuong(), Integer::sum);
+	                MonAn monAn = monAnDAO.getMonAnById(chiTiet.getMonAnId());
+	                if (monAn != null) {
+	                    tongTien += monAn.getGia() * chiTiet.getSoLuong();
+	                }
+	            }
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	            JOptionPane.showMessageDialog(this, "Lỗi khi lấy chi tiết đơn hàng: " + e.getMessage(), "Lỗi",
+	                    JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
 
-			JPanel paymentPanel = new JPanel(new GridLayout(8, 1, 10, 10));
-			paymentPanel.setBackground(new Color(245, 245, 245));
-			paymentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+	        long tongTienSauDiscount = (long) (tongTien * (1 - uuDai));
+	        System.out.println("tongTien: " + tongTien + ", uuDai: " + uuDai + ", tongTienSauDiscount: " + tongTienSauDiscount);
 
-			JLabel danhsachMonLabel = new JLabel("Danh sách món:");
-			danhsachMonLabel.setFont(new Font("Arial", Font.BOLD, 14));
-			JTextArea billArea = new JTextArea();
-			billArea.setEditable(false);
-			billArea.setBackground(new Color(230, 243, 250));
-			billArea.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
-			for (Map.Entry<Integer, Integer> entry : monAnMap.entrySet()) {
-				MonAn monAn = monAnDAO.getMonAnById(entry.getKey());
-				if (monAn != null) {
-					billArea.append(monAn.getTenMon() + " x" + entry.getValue() + "\n");
-				}
-			}
-			JScrollPane scrollPane = new JScrollPane(billArea);
-			scrollPane.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
+	        JPanel paymentPanel = new JPanel(new GridLayout(8, 1, 10, 10));
+	        paymentPanel.setBackground(new Color(245, 245, 245));
+	        paymentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-			JLabel tongTienLabel = new JLabel("Tổng tiền: " + new DecimalFormat("#,### VNĐ").format(tongTien));
-			tongTienLabel.setFont(new Font("Arial", Font.BOLD, 14));
-			JLabel discountLabel = new JLabel("Discount: " + (uuDai * 100) + "%");
-			discountLabel.setFont(new Font("Arial", Font.BOLD, 14));
-			JLabel tongSauDiscountLabel = new JLabel(
-					"Tổng sau discount: " + new DecimalFormat("#,### VNĐ").format(tongTienSauDiscount));
-			tongSauDiscountLabel.setFont(new Font("Arial", Font.BOLD, 14));
+	        JLabel danhsachMonLabel = new JLabel("Danh sách món:");
+	        danhsachMonLabel.setFont(new Font("Arial", Font.BOLD, 14));
+	        JTextArea billArea = new JTextArea();
+	        billArea.setEditable(false);
+	        billArea.setBackground(new Color(230, 243, 250));
+	        billArea.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
+	        for (Map.Entry<Integer, Integer> entry : monAnMap.entrySet()) {
+	            MonAn monAn = monAnDAO.getMonAnById(entry.getKey());
+	            if (monAn != null) {
+	                billArea.append(monAn.getTenMon() + " x" + entry.getValue() + "\n");
+	            }
+	        }
+	        JScrollPane scrollPane = new JScrollPane(billArea);
+	        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
 
-			JCheckBox codCheckBox = new JCheckBox("COD");
-			codCheckBox.setBackground(new Color(245, 245, 245));
-			codCheckBox.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
-			codCheckBox.setFont(new Font("Arial", Font.BOLD, 12));
-			JCheckBox vnPayCheckBox = new JCheckBox("VNPay");
-			vnPayCheckBox.setBackground(new Color(245, 245, 245));
-			vnPayCheckBox.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
-			vnPayCheckBox.setFont(new Font("Arial", Font.BOLD, 12));
+	        JLabel tongTienLabel = new JLabel("Tổng tiền: " + new DecimalFormat("#,### VNĐ").format(tongTien));
+	        tongTienLabel.setFont(new Font("Arial", Font.BOLD, 14));
+	        JLabel discountLabel = new JLabel("Discount: " + (uuDai * 100) + "%");
+	        discountLabel.setFont(new Font("Arial", Font.BOLD, 14));
+	        JLabel tongSauDiscountLabel = new JLabel("Tổng sau discount: " + new DecimalFormat("#,### VNĐ").format(tongTienSauDiscount));
+	        tongSauDiscountLabel.setFont(new Font("Arial", Font.BOLD, 14));
 
-			paymentPanel.add(danhsachMonLabel);
-			paymentPanel.add(scrollPane);
-			paymentPanel.add(tongTienLabel);
-			paymentPanel.add(discountLabel);
-			paymentPanel.add(tongSauDiscountLabel);
-			paymentPanel.add(codCheckBox);
-			paymentPanel.add(vnPayCheckBox);
+	        JCheckBox codCheckBox = new JCheckBox("COD");
+	        codCheckBox.setBackground(new Color(245, 245, 245));
+	        codCheckBox.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
+	        codCheckBox.setFont(new Font("Arial", Font.BOLD, 12));
+	        JCheckBox vnPayCheckBox = new JCheckBox("VNPay");
+	        vnPayCheckBox.setBackground(new Color(245, 245, 245));
+	        vnPayCheckBox.setBorder(BorderFactory.createLineBorder(new Color(0, 120, 215), 1));
+	        vnPayCheckBox.setFont(new Font("Arial", Font.BOLD, 12));
 
-			JOptionPane pane1 = new JOptionPane(paymentPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-			JDialog dialog1 = pane1.createDialog(this, "Thanh toán");
-			dialog1.getContentPane().setBackground(new Color(245, 245, 245));
-			JRootPane rootPane1 = dialog1.getRootPane();
-			JButton okButton1 = rootPane1.getDefaultButton();
-			okButton1.setBackground(new Color(74, 144, 226));
-			okButton1.setForeground(Color.WHITE);
-			okButton1.setFocusPainted(false);
-			okButton1.setFont(new Font("Arial", Font.BOLD, 12));
-			okButton1.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-			JButton cancelButton1 = (JButton) Arrays.stream(rootPane1.getComponents())
-					.filter(c -> c instanceof JButton && ((JButton) c).getText().equals("Cancel")).findFirst()
-					.orElse(null);
-			if (cancelButton1 != null) {
-				cancelButton1.setBackground(new Color(74, 144, 226));
-				cancelButton1.setForeground(Color.WHITE);
-				cancelButton1.setFocusPainted(false);
-				cancelButton1.setFont(new Font("Arial", Font.BOLD, 12));
-				cancelButton1.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-			}
-			dialog1.setVisible(true);
+	        paymentPanel.add(danhsachMonLabel);
+	        paymentPanel.add(scrollPane);
+	        paymentPanel.add(tongTienLabel);
+	        paymentPanel.add(discountLabel);
+	        paymentPanel.add(tongSauDiscountLabel);
+	        paymentPanel.add(codCheckBox);
+	        paymentPanel.add(vnPayCheckBox);
 
-			int paymentResult = (pane1.getValue() != null) ? (int) pane1.getValue() : JOptionPane.CANCEL_OPTION;
-			if (paymentResult != JOptionPane.OK_OPTION) {
-				return;
-			}
+	        JOptionPane pane1 = new JOptionPane(paymentPanel, JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
+	        JDialog dialog1 = pane1.createDialog(this, "Thanh toán");
+	        dialog1.getContentPane().setBackground(new Color(245, 245, 245));
+	        JRootPane rootPane1 = dialog1.getRootPane();
+	        JButton okButton1 = rootPane1.getDefaultButton();
+	        okButton1.setBackground(new Color(74, 144, 226));
+	        okButton1.setForeground(Color.WHITE);
+	        okButton1.setFocusPainted(false);
+	        okButton1.setFont(new Font("Arial", Font.BOLD, 12));
+	        okButton1.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+	        JButton cancelButton1 = (JButton) Arrays.stream(rootPane1.getComponents())
+	                .filter(c -> c instanceof JButton && ((JButton) c).getText().equals("Cancel")).findFirst()
+	                .orElse(null);
+	        if (cancelButton1 != null) {
+	            cancelButton1.setBackground(new Color(74, 144, 226));
+	            cancelButton1.setForeground(Color.WHITE);
+	            cancelButton1.setFocusPainted(false);
+	            cancelButton1.setFont(new Font("Arial", Font.BOLD, 12));
+	            cancelButton1.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+	        }
+	        dialog1.setVisible(true);
 
-			String phuongThucThanhToan = codCheckBox.isSelected() ? "COD" : vnPayCheckBox.isSelected() ? "VNPay" : null;
-			if (phuongThucThanhToan == null) {
-				JOptionPane.showMessageDialog(this, "Vui lòng chọn phương thức thanh toán!", "Thông báo",
-						JOptionPane.WARNING_MESSAGE);
-				return;
-			}
+	        int paymentResult = (pane1.getValue() != null) ? (int) pane1.getValue() : JOptionPane.CANCEL_OPTION;
+	        if (paymentResult != JOptionPane.OK_OPTION) {
+	            return;
+	        }
 
-			// Bước 3: Xử lý thanh toán
-			try {
-				if ("COD".equals(phuongThucThanhToan)) {
-					// Lấy ID hóa đơn vừa tạo
-					HoaDon hoaDon = new HoaDon(0, currentOrderId, tongTienSauDiscount, LocalDateTime.now(), idKhachHang,
-							phuongThucThanhToan);
-					int idHoaDon = hoaDonDAO.addHoaDon(hoaDon);
+	        String phuongThucThanhToan = codCheckBox.isSelected() ? "COD" : vnPayCheckBox.isSelected() ? "VNPay" : null;
+	        if (phuongThucThanhToan == null) {
+	            JOptionPane.showMessageDialog(this, "Vui lòng chọn phương thức thanh toán!", "Thông báo",
+	                    JOptionPane.WARNING_MESSAGE);
+	            return;
+	        }
 
-					// Thêm chi tiết hóa đơn
-					List<ChiTietOrder> chiTietOrders = chiTietOrderDAO.getChiTietOrdersByOrderId(currentOrderId);
-					System.out.println("Số lượng chi tiết đơn hàng: " + chiTietOrders.size());
-					for (ChiTietOrder chiTiet : chiTietOrders) {
-						MonAn monAn = monAnDAO.getMonAnById(chiTiet.getMonAnId());
-						if (monAn != null) {
-							ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon(0, // id sẽ tự tăng
-									idHoaDon, chiTiet.getMonAnId(), chiTiet.getSoLuong(),
-									monAn.getGia() * chiTiet.getSoLuong());
-							System.out.println("chi tiết hóa đơn: " + chiTietHoaDon);
-							chiTietHoaDonDAO.addChiTietHoaDon(chiTietHoaDon);
-						}
-					}
-					chiTietOrderDAO.deleteAllChiTietOrder(currentOrderId);
-					KhachHang khachHang = khachHangDAO.getKhachHangById(idKhachHang);
-					int diemTichLuyTang = (int) (tongTien / 100000);
-					System.out.println("Điểm cũ:" + khachHang.getDiemTichLuy());
-					int diemTichLuyMoi = khachHang.getDiemTichLuy() + diemTichLuyTang;
-					System.out.println("Điểm tăng thêm:" + diemTichLuyTang);
-					System.out.println("Điểm mới:" + diemTichLuyMoi);
-					khachHang.setDiemTichLuy(diemTichLuyMoi);
-					khachHangDAO.updateKhachHang(khachHang);
+	        // Bước 3: Xử lý thanh toán
+	        try {
+	            if ("COD".equals(phuongThucThanhToan)) {
+	                // Lấy ID hóa đơn vừa tạo
+	                HoaDon hoaDon = new HoaDon(0, currentOrderId, tongTienSauDiscount, LocalDateTime.now(), idKhachHang,
+	                        phuongThucThanhToan);
+	                int idHoaDon = hoaDonDAO.addHoaDon(hoaDon);
 
-					int diemThuongCu = luongDAO.getDiemThuongByIdNhanVien(idTaiKhoan);
-					System.out.println("Điểm thưởng cũ: " + diemThuongCu);
-					int diemThuong = (int) (tongTien / 100000);
-					System.out.println("Điểm thưởng: " + diemThuong);
-					int diemThuongMoi = diemThuongCu + diemThuong;
-					System.out.println("Điểm thưởng mới: " + diemThuongMoi);
-					luongDAO.updateDiemThuong(idTaiKhoan, diemThuongMoi);
+	                // Thêm chi tiết hóa đơn
+	                List<ChiTietOrder> chiTietOrders = chiTietOrderDAO.getChiTietOrdersByOrderId(currentOrderId);
+	                System.out.println("Số lượng chi tiết đơn hàng: " + chiTietOrders.size());
+	                for (ChiTietOrder chiTiet : chiTietOrders) {
+	                    MonAn monAn = monAnDAO.getMonAnById(chiTiet.getMonAnId());
+	                    if (monAn != null) {
+	                        ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon(0, // id sẽ tự tăng
+	                                idHoaDon, chiTiet.getMonAnId(), chiTiet.getSoLuong(),
+	                                monAn.getGia() * chiTiet.getSoLuong());
+	                        System.out.println("chi tiết hóa đơn: " + chiTietHoaDon);
+	                        chiTietHoaDonDAO.addChiTietHoaDon(chiTietHoaDon);
+	                    }
+	                }
+	                chiTietOrderDAO.deleteAllChiTietOrder(currentOrderId);
+	                KhachHang khachHang = khachHangDAO.getKhachHangById(idKhachHang);
+	                int diemTichLuyTang = (int) (tongTien / 100000);
+	                System.out.println("Điểm cũ:" + khachHang.getDiemTichLuy());
+	                int diemTichLuyMoi = khachHang.getDiemTichLuy() + diemTichLuyTang;
+	                System.out.println("Điểm tăng thêm:" + diemTichLuyTang);
+	                System.out.println("Điểm mới:" + diemTichLuyMoi);
+	                khachHang.setDiemTichLuy(diemTichLuyMoi);
+	                khachHangDAO.updateKhachHang(khachHang);
 
-					updateBanAnStatus("Trong");
-					orderDAO.updateOrderStatus(currentOrderId, "DaThanhToan");
+	                int diemThuongCu = luongDAO.getDiemThuongByIdNhanVien(idTaiKhoan);
+	                System.out.println("Điểm thưởng cũ: " + diemThuongCu);
+	                int diemThuong = (int) (tongTien / 100000);
+	                System.out.println("Điểm thưởng: " + diemThuong);
+	                int diemThuongMoi = diemThuongCu + diemThuong;
+	                System.out.println("Điểm thưởng mới: " + diemThuongMoi);
+	                luongDAO.updateDiemThuong(idTaiKhoan, diemThuongMoi);
 
-					JOptionPane.showMessageDialog(this, "Thanh toán thành công cho Bàn " + idBan + "!", "Thông báo",
-							JOptionPane.INFORMATION_MESSAGE);
-					gioHangList.clear();
-					gioHangModel.setRowCount(0);
-					currentOrderId = -1;
-					updateGioHangDisplay();
-					dispose();
-					new ChaoMungUI(idTaiKhoan, tenNhanVien);
-				} else if ("VNPay".equals(phuongThucThanhToan)) {
-					long amount = tongTienSauDiscount;
-					String vnp_TxnRef = String.format("%06d", currentOrderId); // Tạo vnp_TxnRef từ currentOrderId
-					String vnp_OrderInfo = "Thanh toan don hang: " + vnp_TxnRef;
+	                updateBanAnStatus("Trong");
+	                orderDAO.updateOrderStatus(currentOrderId, "DaThanhToan");
 
-					try {
-						String paymentUrl = ajaxServlet.generatePaymentUrl(amount, vnp_OrderInfo, "vn", vnp_TxnRef);
-						System.out.println("Generated VNPay URL: " + paymentUrl);
+	                JOptionPane.showMessageDialog(this, "Thanh toán thành công cho Bàn " + idBan + "!", "Thông báo",
+	                        JOptionPane.INFORMATION_MESSAGE);
+	                gioHangList.clear();
+	                gioHangModel.setRowCount(0);
+	                currentOrderId = -1;
+	                updateGioHangDisplay();
+	                dispose();
+	                new ChaoMungUI(idTaiKhoan, tenNhanVien);
+	            } else if ("VNPay".equals(phuongThucThanhToan)) {
+	                long amount = tongTienSauDiscount;
+	                String vnp_TxnRef = String.format("%06d", currentOrderId); // Tạo vnp_TxnRef từ currentOrderId
+	                String vnp_OrderInfo = "Thanh toan don hang: " + vnp_TxnRef;
 
-						if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-							Desktop.getDesktop().browse(new URI(paymentUrl));
-							JOptionPane.showMessageDialog(this,
-									"Vui lòng hoàn tất thanh toán trên trang VNPay. Ứng dụng sẽ tự động cập nhật sau khi thành công!",
-									"Thông báo", JOptionPane.INFORMATION_MESSAGE);
+	                try {
+	                    String paymentUrl = ajaxServlet.generatePaymentUrl(amount, vnp_OrderInfo, "vn", vnp_TxnRef);
+	                    System.out.println("Generated VNPay URL: " + paymentUrl);
 
-							final long finalTongTien = tongTien;
-							final long finalTongTienSauDiscount = tongTienSauDiscount;
-							final int finalIdKhachHang = idKhachHang;
-							final String finalVnp_TxnRef = vnp_TxnRef;
+	                    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+	                        Desktop.getDesktop().browse(new URI(paymentUrl));
+	                        JOptionPane.showMessageDialog(this,
+	                                "Vui lòng hoàn tất thanh toán trên trang VNPay. Ứng dụng sẽ tự động cập nhật sau khi thành công!",
+	                                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
 
-							new Thread(() -> {
-								watchForVnpaySuccess(finalTongTien, finalTongTienSauDiscount, finalIdKhachHang,
-										finalVnp_TxnRef);
-							}).start();
-						} else {
-							JOptionPane.showMessageDialog(this, "Không thể mở trình duyệt để thanh toán VNPay!", "Lỗi",
-									JOptionPane.ERROR_MESSAGE);
-						}
-					} catch (UnsupportedEncodingException | URISyntaxException e) {
-						e.printStackTrace();
-						JOptionPane.showMessageDialog(this, "Lỗi khi tạo URL thanh toán VNPay!", "Lỗi",
-								JOptionPane.ERROR_MESSAGE);
-					}
-				}
-			} catch (SQLException e) {
-				JOptionPane.showMessageDialog(this, "Lỗi khi thanh toán: " + e.getMessage(), "Lỗi",
-						JOptionPane.ERROR_MESSAGE);
-				e.printStackTrace();
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(this, "Lỗi khi tạo thanh toán VNPay: " + e.getMessage(), "Lỗi",
-						JOptionPane.ERROR_MESSAGE);
-				e.printStackTrace();
-			}
-		}
+	                        final long finalTongTien = tongTien;
+	                        final long finalTongTienSauDiscount = tongTienSauDiscount;
+	                        final int finalIdKhachHang = idKhachHang;
+	                        final String finalVnp_TxnRef = vnp_TxnRef;
+
+	                        new Thread(() -> {
+	                            watchForVnpaySuccess(finalTongTien, finalTongTienSauDiscount, finalIdKhachHang,
+	                                    finalVnp_TxnRef);
+	                        }).start();
+	                    } else {
+	                        JOptionPane.showMessageDialog(this, "Không thể mở trình duyệt để thanh toán VNPay!", "Lỗi",
+	                                JOptionPane.ERROR_MESSAGE);
+	                    }
+	                } catch (UnsupportedEncodingException | URISyntaxException e) {
+	                    e.printStackTrace();
+	                    JOptionPane.showMessageDialog(this, "Lỗi khi tạo URL thanh toán VNPay!", "Lỗi",
+	                            JOptionPane.ERROR_MESSAGE);
+	                }
+	            }
+	        } catch (SQLException e) {
+	            JOptionPane.showMessageDialog(this, "Lỗi khi thanh toán: " + e.getMessage(), "Lỗi",
+	                    JOptionPane.ERROR_MESSAGE);
+	            e.printStackTrace();
+	        } catch (Exception e) {
+	            JOptionPane.showMessageDialog(this, "Lỗi khi tạo thanh toán VNPay: " + e.getMessage(), "Lỗi",
+	                    JOptionPane.ERROR_MESSAGE);
+	            e.printStackTrace();
+	        }
+	    }
 	}
 
 	private void watchForVnpaySuccess(long tongTien, long tongTienSauDiscount, int idKhachHang, String vnp_TxnRef) {

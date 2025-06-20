@@ -14,5 +14,25 @@
 	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/log4j-slf4j2-impl-2.23.1.jar"/>
 	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/mysql-connector-java-8.0.30.jar"/>
 	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/slf4j-api-2.0.7.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/twilio-10.9.2.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/jackson-annotations-2.19.0.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/jackson-core-2.19.0.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/jackson-databind-2.19.0.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/jackson-datatype-jsr310-2.19.0.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/httpclient-4.5.14.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/httpcore-4.4.16.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/log4j-api-2.23.1.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/log4j-core-2.23.1.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/okhttp-4.10.0.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/kotlin-stdlib-1.9.0.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/okio-2.10.0.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/javax.mail-api-1.6.2.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/javax.activation-api-1.2.0.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/javax.mail-1.6.2.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/javax.activation-1.2.0.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/kafka-schema-registry-client-6.2.0.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/server-sdk-9.3.1.jar"/>
+	<classpathentry kind="lib" path="E:/ki4/java/QuanLiNhaHang/lib/jwt-2.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
