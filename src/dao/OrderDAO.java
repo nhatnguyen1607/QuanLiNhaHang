@@ -9,6 +9,7 @@ import java.util.List;
 
 public class OrderDAO {
     public int addOrder(Order order) throws SQLException {
+    	System.out.println("id_nhanvien received: " + order.getId_nhanvien());
         String sql = "INSERT INTO `order` (banAnId, id_nhanvien, thoiGianTao, trangThai, ghiChu) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

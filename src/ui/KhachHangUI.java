@@ -269,7 +269,7 @@ public class KhachHangUI extends JFrame {
             String message = messageArea.getText().trim().isEmpty() ? "Chúc mừng sinh nhật! Đây là email thử."
                     : messageArea.getText();
             try {
-                sendEmail(email, "Chúc mừng sinh nhật - 2MN", message);
+                sendEmail(email, "Chúc mừng sinh nhật - 2MNm l", message);
                 JOptionPane.showMessageDialog(this, "Đã gửi email thử đến " + email);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Lỗi khi gửi email: " + e.getMessage(), "Lỗi",

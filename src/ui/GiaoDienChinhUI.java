@@ -4,6 +4,7 @@ import dao.ThuMucMonAnDAO;
 import dao.MonAnDAO;
 import dao.MonAnNguyenLieuDAO;
 import dao.NguyenLieuDAO;
+import dao.NhanVienDAO;
 import dao.OrderDAO;
 import dao.ChiTietOrderDAO;
 import dao.BanAnDAO;
@@ -16,6 +17,7 @@ import model.ThuMucMonAn;
 import model.MonAn;
 import model.MonAnNguyenLieu;
 import model.NguyenLieu;
+import model.NhanVien;
 import model.GioHangItem;
 import model.Order;
 import model.BanAn;
@@ -80,6 +82,7 @@ public class GiaoDienChinhUI extends JFrame {
 	private MonAnDAO monAnDAO;
 	private OrderDAO orderDAO;
 	private ChiTietOrderDAO chiTietOrderDAO;
+	private NhanVienDAO nhanVienDAO;
 	private BanAnDAO banAnDAO;
 	private KhachHangDAO khachHangDAO;
 	private HoaDonDAO hoaDonDAO;
@@ -104,6 +107,7 @@ public class GiaoDienChinhUI extends JFrame {
 		this.chiTietOrderDAO = new ChiTietOrderDAO();
 		this.banAnDAO = new BanAnDAO();
 		this.khachHangDAO = new KhachHangDAO();
+		this.nhanVienDAO = new NhanVienDAO();
 		this.hoaDonDAO = new HoaDonDAO();
 		this.luongDAO = new LuongDAO();
 		this.xepHangKhachHangDAO = new XepHangKhachHangDAO();
@@ -513,7 +517,6 @@ public class GiaoDienChinhUI extends JFrame {
 	}
 
 	private void addToGioHang(MonAn monAn) {
-	    // Tìm xem món này đã tồn tại với trạng thái "Moi" chưa
 	    boolean foundMoi = false;
 	    for (GioHangItem item : gioHangList) {
 	        if (item.getMonAn().getId() == monAn.getId() && "Moi".equals(item.getTrangThai())) {
@@ -523,7 +526,6 @@ public class GiaoDienChinhUI extends JFrame {
 	        }
 	    }
 
-	    // Nếu không tìm thấy "Moi", kiểm tra "Cu" và tạo mới "Moi" nếu cần
 	    if (!foundMoi) {
 	        boolean foundCu = false;
 	        for (GioHangItem item : gioHangList) {
@@ -586,11 +588,10 @@ public class GiaoDienChinhUI extends JFrame {
 
 	    String ghiChu = ghiChuField.getText().trim();
 	    try {
-	        // Loại bỏ kiểm tra số lượng tồn kho
-
-	        // Kiểm tra và tạo Order mới nếu chưa có
+	    	NhanVien nhanVien = nhanVienDAO.getNhanVienByIdTaiKhoan(idTaiKhoan);
+	    	 int id_nhanvien = nhanVien.getId_nhanvien();
 	        if (currentOrderId == -1) {
-	            Order order = new Order(0, idBan, idTaiKhoan, LocalDateTime.now(), "DangDat",
+	            Order order = new Order(0, idBan, id_nhanvien, LocalDateTime.now(), "DangDat",
 	                    ghiChu.isEmpty() ? null : ghiChu);
 	            currentOrderId = orderDAO.addOrder(order);
 	            updateBanAnStatus("DangPhucVu");
@@ -965,14 +966,13 @@ public class GiaoDienChinhUI extends JFrame {
 	                for (ChiTietOrder chiTiet : chiTietOrders) {
 	                    MonAn monAn = monAnDAO.getMonAnById(chiTiet.getMonAnId());
 	                    if (monAn != null) {
-	                        ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon(0, // id sẽ tự tăng
+	                        ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon(0, 
 	                                idHoaDon, chiTiet.getMonAnId(), chiTiet.getSoLuong(),
 	                                monAn.getGia() * chiTiet.getSoLuong());
 	                        System.out.println("chi tiết hóa đơn: " + chiTietHoaDon);
 	                        chiTietHoaDonDAO.addChiTietHoaDon(chiTietHoaDon);
 	                    }
 	                }
-	                chiTietOrderDAO.deleteAllChiTietOrder(currentOrderId);
 	                KhachHang khachHang = khachHangDAO.getKhachHangById(idKhachHang);
 	                int diemTichLuyTang = (int) (tongTien / 100000);
 	                System.out.println("Điểm cũ:" + khachHang.getDiemTichLuy());
@@ -1082,7 +1082,6 @@ public class GiaoDienChinhUI extends JFrame {
 									chiTietHoaDonDAO.addChiTietHoaDon(chiTietHoaDon);
 								}
 							}
-							chiTietOrderDAO.deleteAllChiTietOrder(currentOrderId);
 
 							KhachHang khachHang = khachHangDAO.getKhachHangById(idKhachHang);
 							int diemTichLuyTang = (int) (tongTien / 100000);
